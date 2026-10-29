@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Rideo customer dev server",
+			"type": "shell",
+			"command": "pnpm --filter @rideo/customer dev",
+			"isBackground": true,
+			"problemMatcher": []
+		}
+	]
+}

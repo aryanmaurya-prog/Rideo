@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BikeStatus {
+  AVAILABLE
+  RESERVED
+  IN_USE
+  MAINTENANCE
+  INACTIVE
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id           String    @id @default(cuid())
+  phone        String?   @unique
+  password     String?
+  displayName  String?
+  email        String    @unique
+  avatarUrl    String?
+  city         String?
+  role         String    @default("RIDER")
+  totalRides   Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  bookings     Booking[]
+}
+
+model Bike {
+  id                 String      @id @default(cuid())
+  name               String
+  category           String
+  city               String
+  latitude           Decimal     @db.Decimal(9, 6)
+  longitude          Decimal     @db.Decimal(9, 6)
+  hourlyRatePaise    Int
+  status             BikeStatus  @default(AVAILABLE)
+  imageUrl           String
+  registrationNumber String      @unique
+  year               Int
+  engineCc           Int?
+  mileageKmpl        Decimal?    @db.Decimal(5, 2)
+  fuelType           String
+  transmission       String
+  features           String[]
+  description        String
+  rating             Decimal     @db.Decimal(2, 1)
+  totalRides         Int
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  bookings           Booking[]
+
+  @@index([city, status])
+}
+
+model Booking {
+  id             String        @id @default(cuid())
+  userId         String
+  bikeId         String
+  startsAt       DateTime
+  endsAt         DateTime
+  status         BookingStatus @default(PENDING)
+  totalPaise     Int
+  paymentRef     String?       @unique
+  pickupLat      Decimal?      @db.Decimal(9, 6)
+  pickupLng      Decimal?      @db.Decimal(9, 6)
+  dropLat        Decimal?      @db.Decimal(9, 6)
+  dropLng        Decimal?      @db.Decimal(9, 6)
+  distanceKm     Decimal?
+  paymentMethod  String?
+  paymentStatus  String?
+  pickupAddress  String?
+  aadhaarNumber  String?
+  drivingLicense String?
+  agreedToTerms  Boolean?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  user           User          @relation(fields: [userId], references: [id])
+  bike           Bike          @relation(fields: [bikeId], references: [id])
+
+  @@index([bikeId, startsAt, endsAt])
+  @@index([userId, createdAt])
+  @@index([status, startsAt])
+}
