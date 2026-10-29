@@ -178,6 +178,9 @@ importers:
       eslint:
         specifier: ^8.57.1
         version: 8.57.1
+      prisma:
+        specifier: ^6.19.3
+        version: 6.19.3(typescript@5.9.3)
       typescript:
         specifier: ^5.8.3
         version: 5.9.3
