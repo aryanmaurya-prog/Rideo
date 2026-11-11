@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { API_URL } from '../../../lib/api';
 import { formatRupees, type Bike } from '../../../components/bike-data';
 
 type BikeDetails = Bike & {
@@ -19,7 +20,7 @@ export default function BikeDetailPage({ params }: { params: { id: string } }) {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch(`http://localhost:4000/api/bikes/${params.id}`)
+    fetch(`${API_URL}/bikes/${params.id}`)
       .then((res) => {
         if (!res.ok) throw new Error('Bike not found');
         return res.json();

@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { BikeCard } from '../../components/bike-card';
+import { API_URL } from '../../lib/api';
 import { useSearchParams } from 'next/navigation';
 
 type Bike = {
@@ -38,7 +39,7 @@ function BikesListContent() {
     if (sort !== 'recommended') params.set('sort', sort);
     params.set('limit', '50'); // Fetch more for frontend filtering
 
-    fetch(`http://localhost:4000/api/bikes?${params.toString()}`)
+    fetch(`${API_URL}/bikes?${params.toString()}`)
       .then((res) => res.json())
       .then((data) => {
         setBikes(data.data || []);

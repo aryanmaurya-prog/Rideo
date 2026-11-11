@@ -30,7 +30,12 @@ export default function AuthPage() {
           isSignup ? { email, password, displayName } : { email, password },
         ),
       });
-      const data = await response.json();
+      let data: { message?: string; accessToken?: string; user?: { displayName?: string } };
+      try {
+        data = await response.json();
+      } catch {
+        throw new Error('The API returned an invalid response. Please try again later.');
+      }
 
       if (!response.ok) {
         throw new Error(data.message || 'Authentication failed');
@@ -53,7 +58,13 @@ export default function AuthPage() {
         : '/dashboard';
       window.setTimeout(() => router.push(destination), 1000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Authentication failed');
+      setError(
+        err instanceof TypeError
+          ? 'Could not connect to the API. Check the API URL and backend CORS settings, then try again.'
+          : err instanceof Error
+            ? err.message
+            : 'Authentication failed',
+      );
     } finally {
       setLoading(false);
     }
