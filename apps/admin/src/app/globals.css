@@ -257,10 +257,47 @@ select {
   width: 34px;
   height: 34px;
   place-items: center;
+  padding: 0;
+  border: 0;
   border-radius: 50%;
   background: #283446;
   color: #dbeafe;
   font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-profile-menu {
+  position: relative;
+}
+
+.admin-profile-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  min-width: 140px;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 12px 30px rgb(0 0 0 / 25%);
+}
+
+.admin-profile-dropdown button {
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-profile-dropdown button:hover,
+.admin-profile-dropdown button:focus-visible {
+  background: var(--line);
+  outline: none;
 }
 
 .admin-content {

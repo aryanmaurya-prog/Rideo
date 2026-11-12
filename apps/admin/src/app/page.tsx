@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { fetchAdminApi } from '../lib/api';
 
 export default function AdminDashboard() {
   const [data, setData] = useState<any>(null);
@@ -8,19 +9,20 @@ export default function AdminDashboard() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-
-    if (!token) {
-      // Token nahi hai toh login page pe bhej do
+    if (!localStorage.getItem('token')) {
       window.location.href = '/login';
       return;
     }
 
-    fetch('http://localhost:4000/api/admin/dashboard', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetchAdminApi('/admin/dashboard')
       .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch');
+        if (!res.ok) {
+          throw new Error(
+            res.status === 403
+              ? 'Admin access is required to view the dashboard.'
+              : `Failed to fetch dashboard (${res.status}).`,
+          );
+        }
         return res.json();
       })
       .then((res) => {
@@ -29,7 +31,7 @@ export default function AdminDashboard() {
       })
       .catch((err) => {
         console.error(err);
-        setError('Failed to load dashboard. Token might be invalid.');
+        setError(err instanceof Error ? err.message : 'Failed to load dashboard.');
         setLoading(false);
       });
   }, []);

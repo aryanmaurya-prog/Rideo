@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+import { fetchAdminApi } from '../../lib/api';
 
 export default function SettingsPage() {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -30,12 +29,9 @@ export default function SettingsPage() {
 
     setSaving(true);
     try {
-      const response = await fetch(`${API_URL}/users/me/password`, {
+      const response = await fetchAdminApi('/users/me/password', {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentPassword, newPassword }),
       });
       const data = (await response.json()) as { message?: string | string[] };

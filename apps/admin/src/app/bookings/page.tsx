@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { fetchAdminApi } from '../../lib/api';
 
 type Booking = {
   id: string;
@@ -18,15 +19,12 @@ export default function BookingsPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
+    if (!localStorage.getItem('token')) {
       window.location.href = '/login';
       return;
     }
 
-    fetch('http://localhost:4000/api/bookings', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetchAdminApi('/bookings')
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch bookings');
         return res.json();
@@ -37,25 +35,25 @@ export default function BookingsPage() {
       })
       .catch((err) => {
         console.error(err);
-        setError('Failed to load bookings. Token might be invalid.');
+        setError('Failed to load bookings.');
         setLoading(false);
       });
   }, []);
 
   const handleStatusChange = async (id: string, newStatus: string) => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
+    if (!localStorage.getItem('token')) {
+      window.location.href = '/login';
+      return;
+    }
 
     try {
-      await fetch(`http://localhost:4000/api/bookings/${id}/status`, {
+      const response = await fetchAdminApi(`/bookings/${id}/status`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       });
 
+      if (!response.ok) throw new Error('Failed to update status');
       setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, status: newStatus } : b)));
     } catch (err) {
       alert('Failed to update status');

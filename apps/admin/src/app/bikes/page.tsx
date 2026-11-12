@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { fetchAdminApi } from '../../lib/api';
 
 type Bike = {
   id: string;
@@ -18,15 +19,12 @@ export default function BikesPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
+    if (!localStorage.getItem('token')) {
       window.location.href = '/login';
       return;
     }
 
-    fetch('http://localhost:4000/api/bikes?limit=100', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetchAdminApi('/bikes?limit=100')
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch bikes');
         return res.json();
@@ -37,7 +35,7 @@ export default function BikesPage() {
       })
       .catch((err) => {
         console.error(err);
-        setError('Failed to load bikes. Token might be invalid.');
+        setError('Failed to load bikes.');
         setLoading(false);
       });
   }, []);

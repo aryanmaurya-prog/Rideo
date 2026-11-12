@@ -20,6 +20,7 @@ export function AdminShell({ children }: Readonly<{ children: React.ReactNode }>
   const pathname = usePathname();
   const isLoginPage = pathname === '/login';
   const [light, setLight] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem('rideo-admin-theme');
@@ -31,6 +32,11 @@ export function AdminShell({ children }: Readonly<{ children: React.ReactNode }>
     window.localStorage.setItem('rideo-admin-theme', nextLight ? 'light' : 'dark');
     setLight(nextLight);
   }
+
+  const handleLogout = () => {
+    window.localStorage.removeItem('token');
+    window.location.href = '/login';
+  };
 
   return (
     <div className={`admin-layout${light ? ' light' : ''}${isLoginPage ? ' auth-layout' : ''}`}>
@@ -72,7 +78,29 @@ export function AdminShell({ children }: Readonly<{ children: React.ReactNode }>
                 {light ? '☾' : '☼'}
               </button>
               <span aria-label="Notifications">♧</span>
-              <span className="admin-avatar" aria-label="Admin profile">A</span>
+              <div className="admin-profile-menu">
+                <button
+                  className="admin-avatar"
+                  type="button"
+                  aria-label="Admin profile menu"
+                  aria-haspopup="menu"
+                  aria-expanded={isDropdownOpen}
+                  onClick={() => setIsDropdownOpen((open) => !open)}
+                >
+                  A
+                </button>
+                {isDropdownOpen && (
+                  <div className="admin-profile-dropdown" role="menu">
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </header>
         )}

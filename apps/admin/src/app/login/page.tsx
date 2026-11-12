@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { API_URL } from '../../lib/api';
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -16,20 +17,31 @@ export default function AdminLogin() {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:4000/api/auth/login', {
+      const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
+      const data = (await res.json()) as {
+        message?: string | string[];
+        accessToken?: string;
+        user?: { role?: string };
+      };
 
       if (!res.ok) {
-        throw new Error(data.message || 'Login failed');
+        throw new Error(
+          Array.isArray(data.message) ? data.message.join(', ') : data.message || 'Login failed',
+        );
       }
 
-      if (data.user.role !== 'ADMIN') {
-        throw new Error('Access denied. Admin account required.');
+      if (data.user?.role !== 'ADMIN') {
+        localStorage.removeItem('token');
+        throw new Error('Access Denied: Admin account required.');
+      }
+
+      if (!data.accessToken) {
+        throw new Error('Login succeeded without an access token. Please try again.');
       }
 
       localStorage.setItem('token', data.accessToken);
